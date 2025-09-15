@@ -21,7 +21,7 @@ def add_deal(request: HttpRequest) -> HttpResponse:
             'OPPORTUNITY': opportunity_value,
             'BEGINDATE': begindate,
             'CLOSEDATE': closedate,
-            'UF_CRM_1757887195': address,  # адрес доставки
+            'UF_CRM_1757887195': address,
         }
         try:
             bitrix = request.bitrix_user_token

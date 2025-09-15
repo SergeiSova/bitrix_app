@@ -40,6 +40,7 @@ def active_deals(request: HttpRequest) -> HttpResponse:
             {
                 'filter': {
                     'ASSIGNED_BY_ID': user_id,
+                    "!@STAGE_ID": ["WON", "LOSE", "APPLOGY"],
                 },
                 'order': {'BEGINDATE': 'ASC'},
                 'select': [
