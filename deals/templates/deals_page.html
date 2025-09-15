@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Сделки</title>
+</head>
+<body>
+    <h1>Сделки {{ request.bitrix_user.first_name }} {{ request.bitrix_user.last_name }}</h1>
+    <button onclick="document.location='{% url 'start' %}'">Обратно в меню</button>
+    <button onclick="document.location='{% url 'deals' %}'">Активные сделки</button>
+    <button onclick="document.location='{% url 'add_deal' %}'">Добавить сделку</button>
+    {% block content %} {% endblock %}
+</body>
+</html>

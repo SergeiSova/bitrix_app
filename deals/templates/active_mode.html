@@ -1,0 +1,79 @@
+{% extends "deals_page.html" %}
+
+{% block content %}
+<h2>Активные сделки</h2>
+<div id="table-container"></div>
+
+{{ recent_active|json_script:"recent-deals-data" }}
+
+<script>
+    const dealsData = JSON.parse(
+        document.getElementById('recent-deals-data').textContent
+    );
+
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.marginTop = '10px';
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+
+    const headers = ['ID', 'Название', 'Этап', 'Сумма', 'Дата начала', 'Дата завершения', 'Адрес доставки'];
+
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.border = '1px solid #333';
+        th.style.padding = '5px';
+        th.style.background = '#eee';
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    dealsData.forEach(deal => {
+        const row = document.createElement('tr');
+
+        let opportunityValue = '—';
+        if (deal.OPPORTUNITY !== undefined && deal.OPPORTUNITY !== null) {
+            if (typeof deal.OPPORTUNITY === 'number') {
+                opportunityValue = deal.OPPORTUNITY.toLocaleString('ru-RU', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } else {
+                opportunityValue = deal.OPPORTUNITY;
+            }
+        }
+
+        // Используем читаемое название этапа вместо системного идентификатора
+        const cells = [
+            deal.ID,
+            deal.TITLE,
+            deal.STAGE_NAME || deal.STAGE_ID, // Используем читаемое название, если есть
+            opportunityValue,
+            deal.BEGINDATE,
+            deal.CLOSEDATE,
+            deal.ADDRESS || '—'
+        ];
+
+        cells.forEach(cellData => {
+            const td = document.createElement('td');
+            td.textContent = cellData !== undefined && cellData !== null ? cellData : '—';
+            td.style.border = '1px solid #333';
+            td.style.padding = '5px';
+            row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    document.getElementById('table-container').appendChild(table);
+</script>
+
+{% endblock %}

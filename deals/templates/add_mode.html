@@ -1,0 +1,43 @@
+{% extends "deals_page.html" %}
+
+{% block content %}
+<h2>Добавить сделку</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <label for="title">Название сделки:</label><br>
+        <input type="text" id="title" name="title" required>
+    </p>
+    <p>
+        <label for="stage_id">Этап сделки:</label><br>
+        <select name="stage_id" id="stage_id" required>
+            <option value="NEW">Новая</option>
+            <option value="PREPARATION">В обработке</option>
+            <option value="EXECUTING">В работе</option>
+            <option value="FINAL_INVOICE">Выставлен счет</option>
+            <option value="WON">Успешна</option>
+            <option value="LOSE">Неуспешна</option>
+        </select>
+    </p>
+    <p>
+        <label for="opportunity">Сумма сделки:</label><br>
+        <input type="number" step="0.01" id="opportunity" name="opportunity" required>
+    </p>
+    <p>
+        <label for="begindate">Дата начала сделки:</label><br>
+        <input type="date" id="begindate" name="begindate" required>
+    </p>
+    <p>
+        <label for="closedate">Дата окончания сделки:</label><br>
+        <input type="date" id="closedate" name="closedate">
+    </p>
+    <p>
+        <label for="address">Адрес доставки:</label><br>
+        <input type="text" id="address" name="address">
+    </p>
+    <button type="submit">Сохранить</button>
+</form>
+
+<p><a href="{% url 'deals' %}">Вернуться к списку сделок</a></p>
+{% endblock %}
