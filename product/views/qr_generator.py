@@ -55,9 +55,10 @@ def qr_generator(request):
             product_id = int(products[0]['ID'])
 
         root_url = os.environ['ROOT_URL']
+        # root_url = os.getenv('ROOT_URL', 'http://localhost:8000/')
         QRLink.objects.create(product_id=product_id)
         uuid = str(QRLink.objects.filter(product_id=product_id).last().unique_id)
-        gen_url = root_url + "product/card/" + uuid
+        gen_url = root_url + "/product/card/" + uuid
 
         qr_img = qrcode.make(gen_url)
         buffer = io.BytesIO()

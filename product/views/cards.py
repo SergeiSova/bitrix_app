@@ -10,9 +10,22 @@ from integration_utils.bitrix24.exceptions import BitrixApiError
 from product.models import QRLink
 
 
+
+
 load_dotenv()
 
+
+from django.conf import settings
+
+
+
+
+
+
+
 def product_card(request, uuid):
+    bitrix_domain = settings.BITRIX_DOMAIN
+    bitrix_webhook_auth = settings.BITRIX_WEBHOOK_AUTH
 
     try:
         relation = QRLink.objects.get(unique_id=uuid)
@@ -22,13 +35,15 @@ def product_card(request, uuid):
     product_id = relation.product_id
 
     try:
-        bitrix_domain = os.environ['BITRIX_DOMAIN']
-        bitrix_webhook_auth = os.environ['BITRIX_WEBHOOK_AUTH']
+        # bitrix_domain = os.environ['BITRIX_DOMAIN']
+        # bitrix_webhook_auth = os.environ['BITRIX_WEBHOOK_AUTH']
 
         webhook_token = BitrixToken(
-            domain=bitrix_domain,
-            web_hook_auth=bitrix_webhook_auth
+            domain=settings.BITRIX_DOMAIN,
+            web_hook_auth=settings.BITRIX_WEBHOOK_AUTH
         )
+
+
 
         product_data = webhook_token.call_api_method(
             "crm.product.get",
