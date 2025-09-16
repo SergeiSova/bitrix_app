@@ -1,0 +1,59 @@
+{% extends "product_page.html" %}
+
+{% block content %}
+  <h2>Каталог сделок ({{ products|length }} позиций)</h2>
+  <div id="table-container"></div>
+
+  {{ products|json_script:"products-data" }}
+
+<script>
+  const productsData = JSON.parse(
+    document.getElementById('products-data').textContent
+  );
+
+  const table = document.createElement('table');
+  table.style.borderCollapse = 'collapse';
+  table.style.width = '100%';
+  table.style.marginTop = '10px';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  const headers = ['ID', 'Товар', 'Актуальность', 'Дата создания', 'Цена'];
+  headers.forEach(headerText => {
+    const th = document.createElement('th');
+    th.textContent = headerText;
+    th.style.border = '1px solid #333';
+    th.style.padding = '5px';
+    th.style.background = '#eee';
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  productsData.forEach(deal => {
+    const row = document.createElement('tr');
+
+    const cells = [
+      deal.ID,
+      deal.NAME,
+      deal.ACTIVE,
+      deal.DATE_CREATE,
+      deal.PRICE
+    ];
+    cells.forEach(cellData => {
+      const td = document.createElement('td');
+      td.textContent = cellData !== undefined ? cellData : '';
+      td.style.border = '1px solid #333';
+      td.style.padding = '5px';
+      row.appendChild(td);
+    });
+
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+
+  document.getElementById('table-container').appendChild(table);
+</script>
+{% endblock %}

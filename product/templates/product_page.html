@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Products</title>
+</head>
+<body>
+  <h1>
+    Карточка товара (user: {% if request.bitrix_user.first_name %}{{ request.bitrix_user.first_name }} {{ request.bitrix_user.last_name }}{% else %}Гость{% endif %})
+  </h1>
+  <button onclick="document.location='{% url 'start'%}'">⤾ Обратно в меню</button>
+  <button onclick="document.location='{% url 'qr_generator'%}'">⤾ Сгенерировать карточку товара</button>
+  <button onclick="document.location='{% url 'catalog'%}'">⤾ Каталог товаров</button>
+
+  {% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "product_page.html" %}
+
+{% block content %}
+  <h1>ID: {{ product.ID }} | {{ product.NAME }}</h1>
+  {% if image_url %}
+    <img src="{{ image_url }}" alt="Фото товара" style="max-width:300px;">
+  {% else %}
+    <p>Фото отсутствует.</p>
+  {% endif %}
+  <h2>Описание:</h2>
+  <p>{{ product.DESCRIPTION|striptags }}</p>
+  <h2>Цена:</h2>
+  <p>{{ product.PRICE }} {{ product.CURRENCY_ID }}</p>
+{% endblock %}
