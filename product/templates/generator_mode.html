@@ -1,7 +1,7 @@
 {% extends "product_page.html" %}
 
 {% block content %}
-  <h2>Для генерации введите необходимую информацию</h2>
+  <h2>Генерация QR-кода для товара</h2>
 
   <!-- Отображение ошибок -->
   {% if error_message %}
@@ -28,75 +28,85 @@
       border-radius: 5px;
       margin: 20px 0;
     ">
-      ✅ QR-код успешно сгенерирован!
+      ✅ QR-код для товара "{{ product_name }}" успешно сгенерирован!
     </div>
   {% endif %}
 
+  <!-- Форма поиска товара -->
   <form method="post" action="{% url 'qr_generator' %}">
     {% csrf_token %}
-    <table>
-      <tr>
-        <td>
-          <label for="product_id">ID товара:</label><br>
-          <input
-            type="number"
-            step="1"
-            min="1"
-            name="product_id"
-            id="product_id"
-            placeholder="Введите ID"
-            value="{{ form_data.product_id|default:'' }}">
-        </td>
-        <td style="text-align: center; vertical-align: middle; padding: 0 30px;">
-          или
-        </td>
-        <td style="position: relative;">
-          <label for="product_name">Название товара:</label><br>
-          <input
-            type="text"
-            name="product_name"
-            id="product_name"
-            placeholder="Введите название"
-            style="width: 230px;"
-            value="{{ form_data.product_name|default:'' }}">
-          <ul id="autocomplete_results" hidden style="
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-          "></ul>
-        </td>
-      </tr>
-    </table>
 
-    <div style="margin-top: 20px;">
+    <div style="margin-bottom: 20px;">
+      <label for="product_name" style="
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 16px;
+      ">
+        Название товара:
+      </label>
+
+      <div style="position: relative; display: inline-block;">
+        <input
+          type="text"
+          name="product_name"
+          id="product_name"
+          placeholder="Начните вводить название товара..."
+          style="
+            width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ced4da;
+            border-radius: 5px;
+            box-sizing: border-box;
+          "
+          value="{{ form_data.product_name|default:'' }}"
+          autocomplete="off"
+          required>
+
+        <!-- Список автодополнения -->
+        <ul id="autocomplete_results" hidden style="
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ccc;
+          border-top: none;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          border-radius: 0 0 5px 5px;
+        "></ul>
+      </div>
+
+
+    </div>
+
+    <div style="margin-top: 25px;">
       <button type="submit" style="
-        padding: 10px 30px;
-        width: 500px;
+        padding: 15px 40px;
+        font-size: 18px;
+        font-weight: bold;
         background-color: #007bff;
         color: white;
         border: none;
-        border-radius: 5px;
-        font-size: 16px;
+        border-radius: 8px;
         cursor: pointer;
-      ">
-        Создать карточку
+        transition: background-color 0.3s;
+      " onmouseover="this.style.backgroundColor='#0056b3'"
+         onmouseout="this.style.backgroundColor='#007bff'">
+        🎯 Создать QR-код
       </button>
     </div>
   </form>
 
   <script>
     const nameInput = document.getElementById("product_name");
-    const idInput = document.getElementById("product_id");
     const resultsContainer = document.getElementById("autocomplete_results");
 
     let timeoutId;
@@ -105,7 +115,7 @@
       clearTimeout(timeoutId);
       const query = nameInput.value.trim();
 
-      if (query.length === 0) {
+      if (query.length < 2) {
         resultsContainer.hidden = true;
         return;
       }
@@ -122,17 +132,24 @@
             resultsContainer.innerHTML = "";
 
             if (!data.results || data.results.length === 0) {
-              resultsContainer.hidden = true;
+              const li = document.createElement("li");
+              li.textContent = "Товары не найдены";
+              li.style.padding = "8px 12px";
+              li.style.color = "#999";
+              li.style.fontStyle = "italic";
+              resultsContainer.appendChild(li);
+              resultsContainer.hidden = false;
               return;
             }
 
             data.results.forEach(item => {
               const li = document.createElement("li");
-              li.textContent = item.name;
+              li.innerHTML = `<strong>${item.name}</strong> <span style="color: #666; font-size: 12px;">(ID: ${item.id})</span>`;
               li.dataset.id = item.id;
+              li.dataset.name = item.name;
 
               // Стили для элементов списка
-              li.style.padding = "8px 12px";
+              li.style.padding = "10px 12px";
               li.style.cursor = "pointer";
               li.style.borderBottom = "1px solid #eee";
               li.style.backgroundColor = "#fff";
@@ -147,8 +164,8 @@
 
               li.addEventListener("click", () => {
                 nameInput.value = item.name;
-                idInput.value = item.id;
                 resultsContainer.hidden = true;
+                nameInput.focus();
               });
 
               resultsContainer.appendChild(li);
@@ -170,45 +187,51 @@
       }
     });
 
-    // Очищаем поле ID при вводе названия
-    nameInput.addEventListener("input", () => {
-      if (nameInput.value.trim()) {
-        idInput.value = "";
-      }
-    });
-
-    // Очищаем поле названия при вводе ID
-    idInput.addEventListener("input", () => {
-      if (idInput.value.trim()) {
-        nameInput.value = "";
+    // Скрываем список при нажатии Escape
+    nameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
         resultsContainer.hidden = true;
       }
     });
+
+    // Фокус на поле при загрузке страницы
+    nameInput.focus();
   </script>
 
   <!-- Результат генерации QR-кода -->
   {% if qr_base64 and not error_message %}
     <div style="
       margin-top: 30px;
-      padding: 20px;
+      padding: 25px;
       border: 2px solid #28a745;
       border-radius: 10px;
       background-color: #f8fff9;
       text-align: center;
     ">
       <h3 style="color: #28a745; margin-top: 0;">
-        🎉 QR-код готов! (ID товара: {{ product_id }})
+        🎉 QR-код готов!
       </h3>
 
-      <div style="margin: 20px 0;">
-        <img src="data:image/png;base64,{{ qr_base64 }}"
-             alt="QR Code"
-             style="border: 1px solid #ddd; border-radius: 5px;">
+      <div style="margin: 15px 0;">
+        <strong style="font-size: 18px;">{{ product_name }}</strong>
+        <br>
+        <span style="color: #666; font-size: 14px;">ID: {{ product_id }}</span>
       </div>
 
-      <div style="margin-top: 15px;">
-        <p style="margin: 5px 0;">
-          <strong>Ссылка на карточку товара:</strong>
+      <div style="margin: 25px 0;">
+        <img src="data:image/png;base64,{{ qr_base64 }}"
+             alt="QR Code для {{ product_name }}"
+             style="
+               border: 1px solid #ddd;
+               border-radius: 8px;
+               padding: 10px;
+               background: white;
+             ">
+      </div>
+
+      <div style="margin-top: 20px; margin-bottom: 20px;">
+        <p style="margin: 5px 0; font-weight: bold;">
+          Ссылка на карточку товара:
         </p>
         <a href="{{ gen_url }}"
            target="_blank"
@@ -217,41 +240,40 @@
              text-decoration: none;
              word-break: break-all;
              font-size: 14px;
+             background: #f8f9fa;
+             padding: 8px 12px;
+             border-radius: 4px;
+             display: inline-block;
+             margin: 5px 0;
            ">
           {{ gen_url }}
         </a>
       </div>
 
-      <div style="margin-top: 20px;">
-        <button onclick="window.print()" style="
-          padding: 8px 16px;
-          background-color: #17a2b8;
-          color: white;
-          border: none;
-          border-radius: 3px;
-          cursor: pointer;
-          margin-right: 10px;
-        ">
-          🖨️ Печать QR-кода
-        </button>
+      <div style="margin-top: 25px;">
+
 
         <button onclick="copyToClipboard('{{ gen_url }}')" style="
-          padding: 8px 16px;
+          padding: 10px 20px;
           background-color: #6c757d;
           color: white;
           border: none;
-          border-radius: 3px;
+          border-radius: 5px;
           cursor: pointer;
+          margin: 0 5px;
+          font-size: 14px;
         ">
           📋 Копировать ссылку
         </button>
+
+
       </div>
     </div>
 
     <script>
       function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
-          alert('Ссылка скопирована в буфер обмена!');
+          alert('✅ Ссылка скопирована в буфер обмена!');
         }, function(err) {
           console.error('Ошибка копирования: ', err);
           // Fallback для старых браузеров
@@ -261,12 +283,20 @@
           textArea.select();
           try {
             document.execCommand('copy');
-            alert('Ссылка скопирована в буфер обмена!');
+            alert('✅ Ссылка скопирована в буфер обмена!');
           } catch (err) {
-            alert('Не удалось скопировать ссылку');
+            alert('❌ Не удалось скопировать ссылку');
           }
           document.body.removeChild(textArea);
         });
+      }
+
+      function downloadQR() {
+        const qrImage = document.querySelector('img[alt*="QR Code"]');
+        const link = document.createElement('a');
+        link.download = 'QR-код-{{ product_name|slugify }}.png';
+        link.href = qrImage.src;
+        link.click();
       }
     </script>
   {% endif %}

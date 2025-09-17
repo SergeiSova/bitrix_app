@@ -21,50 +21,48 @@ def qr_generator(request):
     success_data = {}
 
     if request.method == 'POST':
-        product_id = request.POST.get('product_id', '').strip()
         product_name = request.POST.get('product_name', '').strip()
 
-        # Проверка заполнения полей
-        if not product_id and not product_name:
-            error_message = "Заполните хотя бы одно поле"
+        print(f"DEBUG: Received product_name = '{product_name}'")  # Отладка
+
+        # Проверка заполнения поля
+        if not product_name:
+            error_message = "Введите название товара"
+            print("DEBUG: Empty product_name, showing error")
 
         else:
             try:
-                # Обработка по ID
-                if product_id:
-                    try:
-                        product_id = int(product_id)
-                    except ValueError:
-                        error_message = "Некорректный ID товара"
+                print(f"DEBUG: Searching for product: '{product_name}'")
 
-                    if not error_message:
-                        try:
-                            product_data = but.call_api_method(
-                                "crm.product.get",
-                                {"id": product_id})
+                # Поиск товара по названию (точное совпадение)
+                products = but.call_api_method("crm.product.list", {
+                    'filter': {'NAME': product_name},
+                    'select': ['ID', 'NAME']
+                })['result']
 
-                            if "result" not in product_data or not product_data["result"]:
-                                error_message = "Продукт с таким ID не найден в Битриксе"
-                        except BitrixApiError:
-                            error_message = "Ошибка при обращении к Битриксу. Возможно товара с данным ID не существует"
+                print(f"DEBUG: Found {len(products)} products with exact match")
 
-                # Обработка по названию
-                elif product_name:
-                    try:
-                        products = but.call_api_method("crm.product.list", {
-                            'filter': {'NAME': product_name},
-                            'select': ['ID']
-                        })['result']
+                if not products:
+                    # Если не найдено точное совпадение, пробуем поиск по вхождению
+                    products = but.call_api_method("crm.product.list", {
+                        'filter': {'?NAME': product_name},
+                        'select': ['ID', 'NAME']
+                    })['result']
 
-                        if not products:
-                            error_message = "Не удалось найти товар с таким названием"
-                        else:
-                            product_id = int(products[0]['ID'])
-                    except BitrixApiError:
-                        error_message = "Ошибка при обращении к Bitrix24"
+                    print(f"DEBUG: Found {len(products)} products with partial match")
 
-                # Генерация QR-кода, если нет ошибок
-                if not error_message:
+                if not products:
+                    error_message = f"Товар с названием '{product_name}' не найден"
+                    print("DEBUG: No products found")
+                else:
+                    # Берем первый найденный товар
+                    product = products[0]
+                    product_id = int(product['ID'])
+                    product_full_name = product['NAME']
+
+                    print(f"DEBUG: Selected product: ID={product_id}, Name='{product_full_name}'")
+
+                    # Генерация QR-кода
                     try:
                         root_url = os.environ.get('ROOT_URL', 'http://localhost:8000/')
 
@@ -72,6 +70,8 @@ def qr_generator(request):
                         qr_link = QRLink.objects.create(product_id=product_id)
                         uuid = str(qr_link.unique_id)
                         gen_url = root_url + "/product/card/" + uuid
+
+                        print(f"DEBUG: Generated URL: {gen_url}")
 
                         # Генерируем QR-код
                         qr_img = qrcode.make(gen_url)
@@ -85,21 +85,28 @@ def qr_generator(request):
                         # Данные для успешного отображения
                         success_data = {
                             "product_id": product_id,
+                            "product_name": product_full_name,
                             "gen_url": gen_url,
                             "qr_base64": qr_base64
                         }
 
+                        print("DEBUG: QR code generated successfully")
+
                     except Exception as e:
                         error_message = f"Ошибка при генерации QR-кода: {str(e)}"
+                        print(f"DEBUG: QR generation error: {e}")
 
+            except BitrixApiError as e:
+                error_message = "Ошибка при обращении к Bitrix24. Проверьте подключение к системе"
+                print(f"DEBUG: Bitrix API error: {e}")
             except Exception as e:
                 error_message = f"Неожиданная ошибка: {str(e)}"
+                print(f"DEBUG: Unexpected error: {e}")
 
     # Возвращаем шаблон с данными об ошибке или успехе
     context = {
         'error_message': error_message,
         'form_data': {
-            'product_id': request.POST.get('product_id', '') if request.method == 'POST' else '',
             'product_name': request.POST.get('product_name', '') if request.method == 'POST' else ''
         }
     }
@@ -107,5 +114,7 @@ def qr_generator(request):
     # Добавляем данные успешной генерации, если есть
     if success_data:
         context.update(success_data)
+
+    print(f"DEBUG: Rendering template with context: error='{error_message}', success={bool(success_data)}")
 
     return render(request, "generator_mode.html", context)
