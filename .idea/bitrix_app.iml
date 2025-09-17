@@ -19,6 +19,7 @@
       <sourceFolder url="file://$MODULE_DIR$/start" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/company" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/company/views" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/contacts" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/staf" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/staff" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/staff/views" isTestSource="false" />
@@ -35,6 +36,7 @@
         <option value="$MODULE_DIR$/product/templates" />
         <option value="$MODULE_DIR$/staff/templates" />
         <option value="$MODULE_DIR$/company/templates" />
+        <option value="$MODULE_DIR$/contacts/templates" />
       </list>
     </option>
   </component>

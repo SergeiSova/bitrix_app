@@ -1,0 +1,61 @@
+{% block company-autocomplete %}
+  <div style="margin-top: 20px; position: relative;">
+    <label for="company_name">Название компании:</label><br>
+    <input
+      type="text"
+      name="company_name"
+      id="company_name"
+      placeholder="Введите название"
+      style="width: 220px;">
+    <input type="hidden" name="company_id" id="company_id">
+    <ul id="autocomplete_results" hidden style="border: 1px solid #ccc; max-height: 200px; overflow-y: auto; padding: 0; margin: 0; width: 220px; position: absolute; background: white; list-style: none;"></ul>
+  </div>
+
+  <script>
+    const nameInput = document.getElementById("company_name");
+    const idInput = document.getElementById("company_id");
+    const resultsContainer = document.getElementById("autocomplete_results");
+
+    let timeoutId;
+
+    nameInput.addEventListener("input", () => {
+      clearTimeout(timeoutId);
+      const query = nameInput.value.trim();
+
+      if (query.length < 2) {
+        resultsContainer.hidden = true;
+        return;
+      }
+
+      timeoutId = setTimeout(() => {
+        fetch(`/contacts/autocomplete?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            resultsContainer.innerHTML = "";
+            if (data.results.length === 0) {
+              resultsContainer.hidden = true;
+              return;
+            }
+
+            data.results.forEach(item => {
+              const li = document.createElement("li");
+              li.textContent = item.title;
+              li.dataset.id = item.id;
+              li.style.padding = "5px";
+              li.style.cursor = "pointer";
+
+              li.addEventListener("click", () => {
+                nameInput.value = item.title;
+                idInput.value = item.id;
+                resultsContainer.hidden = true;
+              });
+
+              resultsContainer.appendChild(li);
+            });
+
+            resultsContainer.hidden = false;
+          });
+      }, 300);
+    });
+  </script>
+{% endblock %}

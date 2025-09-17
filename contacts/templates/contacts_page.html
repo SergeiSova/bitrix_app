@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contacts</title>
+</head>
+<body>
+   <h1>Компании (user: {{request.bitrix_user.first_name}} {{request.bitrix_user.last_name}})</h1>
+   <button onclick="document.location='{% url 'start'%}'">⤾ Обратно в меню</button>
+   <button onclick="document.location='{% url 'import_contacts'%}'">Импортировать контакты</button>
+   <button onclick="document.location='{% url 'export_contacts'%}'">Экспортировать контакты</button>
+
+   {% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,143 @@
+{% extends 'contacts_page.html' %}
+
+{% block content %}
+  <h2>Режим экспорта</h2>
+
+  <h3>Введите необходимые фильтры</h3>
+  <form method="post">
+  {% csrf_token %}
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span>CSV</span>
+
+      <label class='toggle-switch'>
+        <input type='checkbox'
+               name='export_type'/>
+        <span class='slider'></span>
+      </label>
+
+      <span>XLSX</span>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <label for='created_from'>Дата создания профиля (от):</label><br>
+        <input
+          id='created_from'
+          type='datetime-local'
+          name='created_from'
+          style='width: 220px;' />
+    </div>
+
+    <div style="margin-top: 20px;">
+      <label for='last_active'>Последняя активности клиента (от):</label><br>
+      <input
+        id='last_active'
+        type='datetime-local'
+        name='last_active'
+        style='width: 220px;'>
+    </div>
+
+    {% block company-autocomplete %}
+      {% include "company_autocomplete.html" %}
+    {% endblock %}
+
+    <button type="submit" style="margin-top: 10px;">Экспортировать</button>
+  </form>
+
+  <script>
+    const nameInput = document.getElementById("company_name");
+    const idInput = document.getElementById("company_id");
+    const resultsContainer = document.getElementById("autocomplete_results");
+
+    let timeoutId;
+
+    nameInput.addEventListener("input", () => {
+      clearTimeout(timeoutId);
+      const query = nameInput.value.trim();
+
+      if (query.length === 0) {
+        resultsContainer.hidden = true;
+        return;
+      }
+
+      timeoutId = setTimeout(() => {
+        fetch(`/contacts/autocomplete?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            resultsContainer.innerHTML = "";
+            if (data.results.length === 0) {
+              resultsContainer.hidden = true;
+              return;
+            }
+
+            data.results.forEach(item => {
+              const li = document.createElement("li");
+              li.textContent = item.title;
+              li.dataset.id = item.id;
+              li.style.padding = "5px";
+              li.style.cursor = "pointer";
+
+              li.addEventListener("click", () => {
+                nameInput.value = item.title;
+                idInput.value = item.id;
+                resultsContainer.hidden = true;
+              });
+
+              resultsContainer.appendChild(li);
+            });
+
+            resultsContainer.hidden = false;
+          });
+      }, 300);
+    });
+  </script>
+
+  <style>
+  /* Container for the toggle */
+  .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+  }
+
+  /* Hide default checkbox */
+  .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+  }
+
+  /* The track */
+  .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #0d79e6;
+      border-radius: 24px;
+      width: 100%;
+      height: 100%;
+      transition: background-color 0.3s;
+  }
+
+  /* The circular slider */
+  .slider::before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 2px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+  }
+
+  /* Toggled state */
+  .toggle-switch input:checked+.slider {
+      background-color: #4caf50;
+  }
+
+  .toggle-switch input:checked+.slider::before {
+      transform: translateX(26px);
+  }
+  </style>
+{% endblock %}

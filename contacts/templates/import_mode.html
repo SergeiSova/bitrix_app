@@ -1,0 +1,70 @@
+{% extends 'contacts_page.html' %}
+
+{% block content %}
+  <h2>Режим импорта</h2>
+  <h3>* Поддерживаются форматы .csv, .xlsx</h3>
+
+  <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+  {% csrf_token %}
+    <input type="file" id="fileUpload" class="file-upload" name="fileUpload">
+
+    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+      <label for="fileUpload" class="custom-button green-button">
+        Выбрать файл
+      </label>
+
+      <input type="submit" id="uploadButton" name='submit' class="file-upload">
+      <label for="uploadButton" class="custom-button blue-button">
+        Загрузить
+      </label>
+    </div>
+
+    <p id="fileName" style="margin-top: 10px;"></p>
+  </form>
+
+  <script>
+    const fileInput = document.getElementById('fileUpload');
+    const fileNameDisplay = document.getElementById('fileName');
+
+    fileNameDisplay.textContent = 'Файл не выбран';
+
+    fileInput.addEventListener('change', function () {
+      if (this.files.length > 0) {
+        fileNameDisplay.textContent = 'Выбран файл: ' + this.files[0].name;
+      } else {
+        fileNameDisplay.textContent = 'Файл не выбран';
+      }
+    });
+  </script>
+
+  <style>
+    .file-upload {
+      display: none;
+    }
+
+    .custom-button {
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .green-button {
+      background-color: #4CAF50;
+    }
+
+    .green-button:hover {
+      background-color: #45a049;
+    }
+
+    .blue-button {
+      background-color: #2196F3;
+    }
+
+    .blue-button:hover {
+      background-color: #1976D2;
+    }
+  </style>
+{% endblock %}
