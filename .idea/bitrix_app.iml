@@ -17,6 +17,9 @@
       <sourceFolder url="file://$MODULE_DIR$/deals" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/product" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/start" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/staf" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/staff" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/staff/views" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.13 (bitrix_app)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -28,6 +31,7 @@
         <option value="$MODULE_DIR$/start/templates" />
         <option value="$MODULE_DIR$/deals/templates" />
         <option value="$MODULE_DIR$/product/templates" />
+        <option value="$MODULE_DIR$/staff/templates" />
       </list>
     </option>
   </component>

@@ -42,11 +42,10 @@ def autocomplete_products(request):
     except BitrixApiError as e:
         logger.error(f"Bitrix24 API error in autocomplete: {e}")
 
-        # Попробуем альтернативный фильтр, если первый не сработал
         try:
             response = but.call_api_method("crm.product.list", {
                 "filter": {
-                    "NAME": f"%{query}%"  # Альтернативный синтаксис
+                    "NAME": f"%{query}%"
                 },
                 "select": ["ID", "NAME"],
                 "order": {"NAME": "ASC"},

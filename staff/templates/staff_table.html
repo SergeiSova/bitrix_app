@@ -1,0 +1,83 @@
+{% extends "staff_page.html" %}
+
+{% block content %}
+<style>
+.staff-table {
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+.staff-table td,
+.staff-table th {
+    padding: 5px;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+</style>
+<h1>Список сотрудников по отделам</h1>
+
+<table class="staff-table">
+    <thead>
+        <tr>
+            <th>Отдел</th>
+            <th>Фото</th>
+            <th>Имя</th>
+            <th>Должность</th>
+            <th>Руководители</th>
+            <th>Звонков за 24ч</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dep in context %}
+            {% for emp in dep.employees_list %}
+            <tr>
+                {% if forloop.first %}
+                <td rowspan="{{ dep.employees_list|length }}">
+                    <h3>{{ dep.departament_NAME  }}</h3>
+                    ID: {{ dep.departament_ID }}
+
+                </td>
+                {% endif %}
+                <td>
+                    {% if emp.avatar %}
+                    <img src="{{ emp.avatar }}" alt="avatar" width="50" height="50">
+                    {% else %}
+                    Нет фото
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="#" class="users" data-user-id="{{ emp.id }}">
+                        {{ emp.name }}
+                    </a>
+                    <br><small>ID: {{ emp.id }}</small>
+                </td>
+                <td>
+                  {{ emp.work_position|default:"-" }}
+                </td>
+                <td>
+                  {{ dep.managers_list|join:", " }}
+                </td>
+                <td>
+                    {{ emp.calls24|default:"0" }}
+                </td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<script src="https://api.bitrix24.com/api/v1/"></script>
+<script>
+    BX24.init(function () {
+        const links = document.querySelectorAll(".users");
+        links.forEach(function (link) {
+            link.onclick = function () {
+                const userId = this.dataset.userId;
+                BX24.openPath("/company/personal/user/" + userId + "/");
+            };
+        });
+    });
+</script>
+
+{% endblock %}
