@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=59fdd512-90eb-464b-9605-bc86a1bc89a7&lang=ru_RU&load=package.full&debug=true" type="text/javascript"></script>
+
+  <meta charset="UTF-8">
+  <title>Company</title>
+</head>
+
+<body style="min-height: 100vh;">
+  <h1>Компании (user: {{request.bitrix_user.first_name}} {{request.bitrix_user.last_name}})</h1>
+  <button onclick="document.location='{% url 'start'%}'">⤾ Обратно в меню</button>
+
+  {% block content %}{% endblock %}
+</body>
+</html>

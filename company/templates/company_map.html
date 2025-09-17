@@ -1,0 +1,39 @@
+{% extends 'company_page.html' %}
+
+{% block content %}
+  <h1>Список всех компаний на карте</h1>
+
+  <div style="display: flex; min-height: 100vh">
+    <div id="map" style="width: 70%; flex: 1"></div>
+  </div>
+
+  {{ points|json_script:"companies-data" }}
+
+  <script>
+    const companyData = JSON.parse(
+      document.getElementById('companies-data').textContent
+    );
+    console.log('companyData =', companyData);
+
+    ymaps.ready(function () {
+      const map = new ymaps.Map('map', {
+        center: [59.57, 30.19],
+        zoom: 8,
+        controls: []
+      });
+
+      companyData.forEach(function (company) {
+        const placemark = new ymaps.Placemark(company.GEOCODE, {
+          hintContent: company.TITLE
+        }, {
+          iconLayout: 'default#image',
+          iconImageHref: company.logoURL,
+          iconImageSize: [40, 40],
+          iconImageOffset: [-20, -20]
+        });
+
+        map.geoObjects.add(placemark);
+      });
+    });
+  </script>
+{% endblock %}
