@@ -1,14 +1,15 @@
+
 {% block company-autocomplete %}
-  <div style="margin-top: 20px; position: relative;">
-    <label for="company_name">Название компании:</label><br>
+  <div class="autocomplete-container">
+    <label for="company_name">Название компании:</label>
     <input
       type="text"
       name="company_name"
       id="company_name"
-      placeholder="Введите название"
-      style="width: 220px;">
+      placeholder="Введите название компании"
+      class="form-input">
     <input type="hidden" name="company_id" id="company_id">
-    <ul id="autocomplete_results" hidden style="border: 1px solid #ccc; max-height: 200px; overflow-y: auto; padding: 0; margin: 0; width: 220px; position: absolute; background: white; list-style: none;"></ul>
+    <ul id="autocomplete_results" class="autocomplete-results" hidden></ul>
   </div>
 
   <script>
@@ -41,8 +42,7 @@
               const li = document.createElement("li");
               li.textContent = item.title;
               li.dataset.id = item.id;
-              li.style.padding = "5px";
-              li.style.cursor = "pointer";
+              li.classList.add("autocomplete-item");
 
               li.addEventListener("click", () => {
                 nameInput.value = item.title;
@@ -57,5 +57,44 @@
           });
       }, 300);
     });
+
+    // Закрытие выпадающего списка при клике вне его области
+    document.addEventListener('click', (e) => {
+      if (!resultsContainer.contains(e.target) && e.target !== nameInput) {
+        resultsContainer.hidden = true;
+      }
+    });
   </script>
+
+  <style>
+    .autocomplete-container {
+      position: relative;
+      margin: 1.5rem 0;
+    }
+    
+    .autocomplete-results {
+      border: 1px solid #e1e5e9;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      position: absolute;
+      background: white;
+      list-style: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    
+    .autocomplete-item {
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .autocomplete-item:hover {
+      background-color: #f5f7f9;
+    }
+  </style>
 {% endblock %}

@@ -1,58 +1,325 @@
 {% extends "product_page.html" %}
 
 {% block content %}
-  <h2>Каталог сделок ({{ products|length }} позиций)</h2>
-  <div id="table-container"></div>
+<div class="catalog-container">
+    <h2 class="catalog-title">📦 Каталог товаров</h2>
+    <div id="table-container"></div>
+</div>
 
-  {{ products|json_script:"products-data" }}
+{{ products|json_script:"products-data" }}
 
 <script>
-  const productsData = JSON.parse(
-    document.getElementById('products-data').textContent
-  );
+    const productsData = JSON.parse(
+        document.getElementById('products-data').textContent
+    );
 
-  const table = document.createElement('table');
-  table.style.borderCollapse = 'collapse';
-  table.style.width = '100%';
-  table.style.marginTop = '10px';
+    const container = document.getElementById('table-container');
 
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
-  const headers = ['ID', 'Товар', 'Дата создания', 'Цена'];
-  headers.forEach(headerText => {
-    const th = document.createElement('th');
-    th.textContent = headerText;
-    th.style.border = '1px solid #333';
-    th.style.padding = '5px';
-    th.style.background = '#eee';
-    headerRow.appendChild(th);
-  });
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
+    if (productsData.length === 0) {
+        container.innerHTML = '<div class="empty-state">📋 Каталог товаров пуст</div>';
+    } else {
+        const table = document.createElement('table');
+        table.className = 'catalog-table';
 
-  const tbody = document.createElement('tbody');
-  productsData.forEach(deal => {
-    const row = document.createElement('tr');
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        const headers = ['ID', 'Товар', 'Дата создания', 'Цена'];
 
-    const cells = [
-      deal.ID,
-      deal.NAME,
-      deal.DATE_CREATE,
-      deal.PRICE
-    ];
-    cells.forEach(cellData => {
-      const td = document.createElement('td');
-      td.textContent = cellData !== undefined ? cellData : '';
-      td.style.border = '1px solid #333';
-      td.style.padding = '5px';
-      row.appendChild(td);
-    });
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
 
-    tbody.appendChild(row);
-  });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
 
-  table.appendChild(tbody);
+        const tbody = document.createElement('tbody');
 
-  document.getElementById('table-container').appendChild(table);
+        productsData.forEach((product, index) => {
+            const row = document.createElement('tr');
+            row.className = index % 2 === 0 ? 'even' : 'odd';
+
+            // Форматирование цены
+            let priceText = product.PRICE || '—';
+            if (product.PRICE && typeof product.PRICE === 'number') {
+                priceText = product.PRICE.toLocaleString('ru-RU', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + ' ₽';
+            }
+
+            // Форматирование даты
+            let dateText = product.DATE_CREATE || '—';
+            if (product.DATE_CREATE) {
+                try {
+                    const date = new Date(product.DATE_CREATE);
+                    dateText = date.toLocaleDateString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    dateText = product.DATE_CREATE;
+                }
+            }
+
+            const cells = [
+                product.ID,
+                product.NAME || '—',
+                dateText,
+                priceText
+            ];
+
+            cells.forEach((cellData, cellIndex) => {
+                const td = document.createElement('td');
+                td.textContent = cellData !== undefined && cellData !== null ? cellData : '—';
+
+                // Специальные стили для определенных колонок
+                if (cellIndex === 3) { // Цена
+                    td.className = 'price';
+                }
+                if (cellIndex === 1) { // Название товара
+                    td.className = 'product-name';
+                }
+
+                row.appendChild(td);
+            });
+
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        container.appendChild(table);
+    }
 </script>
+
+<style>
+/* Стили для каталога товаров */
+.catalog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.catalog-title {
+    text-align: center;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 1.5rem;
+}
+
+.catalog-stats {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.stats-item {
+    background: linear-gradient(135deg, var(--secondary-color, #3498db), var(--primary-color, #2c3e50));
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: var(--border-radius, 8px);
+    text-align: center;
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+}
+
+.stats-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Таблица каталога */
+.catalog-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: var(--background-color, #ffffff);
+    border-radius: var(--border-radius, 8px);
+    overflow: hidden;
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+}
+
+.catalog-table thead {
+    background: var(--primary-color, #2c3e50);
+    color: white;
+}
+
+.catalog-table th,
+.catalog-table td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.catalog-table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.catalog-table th:first-child {
+    width: 80px;
+    text-align: center;
+}
+
+.catalog-table th:last-child {
+    width: 120px;
+    text-align: right;
+}
+
+.catalog-table td:first-child {
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-light, #7f8c8d);
+}
+
+.catalog-table td:last-child {
+    text-align: right;
+}
+
+.catalog-table tbody tr:hover {
+    background: var(--background-light, #f8f9fa);
+    transition: var(--transition, all 0.3s ease);
+}
+
+.catalog-table tbody tr.even {
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.catalog-table td.price {
+    font-weight: 600;
+    color: var(--success-color, #27ae60);
+}
+
+.catalog-table td.product-name {
+    font-weight: 600;
+    color: var(--primary-color, #2c3e50);
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-light, #7f8c8d);
+    font-size: 1.3rem;
+    background: var(--background-light, #f8f9fa);
+    border-radius: var(--border-radius, 8px);
+    border: 2px dashed var(--border-color, #dee2e6);
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .catalog-table {
+        font-size: 0.9rem;
+    }
+
+    .catalog-table th,
+    .catalog-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .catalog-table {
+        font-size: 0.8rem;
+    }
+
+    .catalog-table th,
+    .catalog-table td {
+        padding: 0.5rem 0.3rem;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+    }
+
+    .stats-item {
+        padding: 1rem 1.5rem;
+    }
+
+    /* Скрываем колонку даты на планшетах */
+    .catalog-table th:nth-child(3),
+    .catalog-table td:nth-child(3) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Альтернативный вид для мобильных */
+    .catalog-table,
+    .catalog-table thead,
+    .catalog-table tbody,
+    .catalog-table th,
+    .catalog-table td,
+    .catalog-table tr {
+        display: block;
+    }
+
+    .catalog-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .catalog-table tr {
+        background: var(--background-color, #ffffff);
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: var(--border-radius, 8px);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+    }
+
+    .catalog-table td {
+        border: none;
+        position: relative;
+        padding: 0.5rem 0;
+        padding-left: 35%;
+        text-align: right;
+    }
+
+    .catalog-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 30%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: 600;
+        text-align: left;
+        color: var(--primary-color, #2c3e50);
+    }
+
+    .stats-item {
+        padding: 0.75rem 1rem;
+    }
+
+    .stats-number {
+        font-size: 1.8rem;
+    }
+
+    .catalog-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Анимация загрузки */
+#table-container:empty::after {
+    content: "Загрузка каталога...";
+    display: block;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-light, #7f8c8d);
+    font-style: italic;
+    font-size: 1.1rem;
+}
+</style>
+
 {% endblock %}

@@ -11,69 +11,253 @@
         document.getElementById('recent-deals-data').textContent
     );
 
-    const table = document.createElement('table');
-    table.style.borderCollapse = 'collapse';
-    table.style.width = '100%';
-    table.style.marginTop = '10px';
+    // Создаем контейнер для таблицы
+    const container = document.getElementById('table-container');
 
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
+    if (dealsData.length === 0) {
+        container.innerHTML = '<div class="empty-state">📋 Активных сделок пока нет</div>';
+    } else {
+        const table = document.createElement('table');
+        table.className = 'deals-table';
 
-    const headers = ['ID', 'Название', 'Этап', 'Сумма', 'Дата начала', 'Дата завершения', 'Адрес доставки'];
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
 
-    headers.forEach(headerText => {
-        const th = document.createElement('th');
-        th.textContent = headerText;
-        th.style.border = '1px solid #333';
-        th.style.padding = '5px';
-        th.style.background = '#eee';
-        headerRow.appendChild(th);
-    });
+        const headers = ['ID', 'Название', 'Этап', 'Сумма', 'Дата начала', 'Дата завершения', 'Адрес доставки'];
 
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-
-    dealsData.forEach(deal => {
-        const row = document.createElement('tr');
-
-        let opportunityValue = '—';
-        if (deal.OPPORTUNITY !== undefined && deal.OPPORTUNITY !== null) {
-            if (typeof deal.OPPORTUNITY === 'number') {
-                opportunityValue = deal.OPPORTUNITY.toLocaleString('ru-RU', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            } else {
-                opportunityValue = deal.OPPORTUNITY;
-            }
-        }
-
-
-        const cells = [
-            deal.ID,
-            deal.TITLE,
-            deal.STAGE_NAME || deal.STAGE_ID,
-            opportunityValue,
-            deal.BEGINDATE,
-            deal.CLOSEDATE,
-            deal.ADDRESS || '—'
-        ];
-
-        cells.forEach(cellData => {
-            const td = document.createElement('td');
-            td.textContent = cellData !== undefined && cellData !== null ? cellData : '—';
-            td.style.border = '1px solid #333';
-            td.style.padding = '5px';
-            row.appendChild(td);
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
         });
 
-        tbody.appendChild(row);
-    });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
 
-    table.appendChild(tbody);
-    document.getElementById('table-container').appendChild(table);
+        const tbody = document.createElement('tbody');
+
+        dealsData.forEach((deal, index) => {
+            const row = document.createElement('tr');
+            row.className = index % 2 === 0 ? 'even' : 'odd';
+
+            let opportunityValue = '—';
+            if (deal.OPPORTUNITY !== undefined && deal.OPPORTUNITY !== null) {
+                if (typeof deal.OPPORTUNITY === 'number') {
+                    opportunityValue = deal.OPPORTUNITY.toLocaleString('ru-RU', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + ' ₽';
+                } else {
+                    opportunityValue = deal.OPPORTUNITY;
+                }
+            }
+
+            // Добавляем иконки для статусов
+            let stageText = deal.STAGE_NAME || deal.STAGE_ID;
+            switch(deal.STAGE_ID) {
+                case 'NEW':
+                    stageText = '🆕 ' + stageText;
+                    break;
+                case 'PREPARATION':
+                    stageText = '⚙️ ' + stageText;
+                    break;
+                case 'EXECUTING':
+                    stageText = '🔄 ' + stageText;
+                    break;
+                case 'FINAL_INVOICE':
+                    stageText = '💰 ' + stageText;
+                    break;
+                case 'WON':
+                    stageText = '✅ ' + stageText;
+                    break;
+                case 'LOSE':
+                    stageText = '❌ ' + stageText;
+                    break;
+            }
+
+            const cells = [
+                deal.ID,
+                deal.TITLE,
+                stageText,
+                opportunityValue,
+                deal.BEGINDATE,
+                deal.CLOSEDATE || '—',
+                deal.ADDRESS || '—'
+            ];
+
+            cells.forEach((cellData, cellIndex) => {
+                const td = document.createElement('td');
+                td.textContent = cellData !== undefined && cellData !== null ? cellData : '—';
+
+                // Специальные стили для определенных колонок
+                if (cellIndex === 3) { // Сумма
+                    td.className = 'amount';
+                }
+                if (cellIndex === 2) { // Этап
+                    td.className = 'stage';
+                }
+
+                row.appendChild(td);
+            });
+
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        container.appendChild(table);
+    }
 </script>
+
+<style>
+/* Стили для таблицы сделок */
+.deals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: var(--background-color, #ffffff);
+    border-radius: var(--border-radius, 8px);
+    overflow: hidden;
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+}
+
+.deals-table thead {
+    background: var(--primary-color, #2c3e50);
+    color: white;
+}
+
+.deals-table th,
+.deals-table td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.deals-table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deals-table tbody tr:hover {
+    background: var(--background-light, #f8f9fa);
+    transition: var(--transition, all 0.3s ease);
+}
+
+.deals-table tbody tr.even {
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.deals-table td.amount {
+    text-align: right;
+    font-weight: 600;
+    color: var(--success-color, #27ae60);
+}
+
+.deals-table td.stage {
+    font-weight: 500;
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-light, #7f8c8d);
+    font-size: 1.2rem;
+    background: var(--background-light, #f8f9fa);
+    border-radius: var(--border-radius, 8px);
+    border: 2px dashed var(--border-color, #dee2e6);
+}
+
+/* Адаптивность таблицы */
+@media (max-width: 1024px) {
+    .deals-table {
+        font-size: 0.9rem;
+    }
+
+    .deals-table th,
+    .deals-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .deals-table {
+        font-size: 0.8rem;
+    }
+
+    .deals-table th,
+    .deals-table td {
+        padding: 0.5rem 0.3rem;
+    }
+
+    /* Скрываем некоторые колонки на мобильном */
+    .deals-table th:nth-child(7),
+    .deals-table td:nth-child(7),
+    .deals-table th:nth-child(6),
+    .deals-table td:nth-child(6) {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Альтернативный вид для очень маленьких экранов */
+    .deals-table,
+    .deals-table thead,
+    .deals-table tbody,
+    .deals-table th,
+    .deals-table td,
+    .deals-table tr {
+        display: block;
+    }
+
+    .deals-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .deals-table tr {
+        background: var(--background-color, #ffffff);
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: var(--border-radius, 8px);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+    }
+
+    .deals-table td {
+        border: none;
+        position: relative;
+        padding: 0.5rem 0;
+        padding-left: 30%;
+        text-align: right;
+    }
+
+    .deals-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 25%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: 600;
+        text-align: left;
+        color: var(--primary-color, #2c3e50);
+    }
+
+    /* Добавляем лейблы через JavaScript будет проще */
+}
+
+/* Анимация загрузки */
+#table-container:empty::after {
+    content: "Загрузка данных...";
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light, #7f8c8d);
+    font-style: italic;
+}
+</style>
 
 {% endblock %}

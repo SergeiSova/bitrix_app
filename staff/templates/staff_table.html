@@ -1,83 +1,387 @@
 {% extends "staff_page.html" %}
 
 {% block content %}
+<div class="departments-container">
+    {% for dep in context %}
+        <div class="department-card">
+            <div class="department-header">
+                <h2 class="department-title">
+                    <span class="department-icon">🏢</span>
+                    {{ dep.departament_NAME }}
+                </h2>
+                <span class="department-id">ID: {{ dep.departament_ID }}</span>
+            </div>
+
+            <div class="department-managers" style="display: {% if dep.managers_list %}block{% else %}none{% endif %};">
+                <div class="managers-label">👔 Руководители:</div>
+                <div class="managers-list">{{ dep.managers_list|join:", " }}</div>
+            </div>
+
+            <div class="employees-section">
+                {% if dep.employees_list %}
+                    <div class="employees-grid">
+                        {% for emp in dep.employees_list %}
+                            <div class="employee-card">
+                                <div class="employee-avatar">
+                                    {% if emp.avatar %}
+                                        <img src="{{ emp.avatar }}" alt="Фото {{ emp.name }}" class="avatar-image">
+                                    {% else %}
+                                        <div class="avatar-placeholder">
+                                            <span class="avatar-icon">👤</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="employee-info">
+                                    <div class="employee-name">{{ emp.name }}</div>
+                                    <div class="employee-id">ID: {{ emp.id }}</div>
+                                    <div class="employee-position">{{ emp.work_position|default:"—" }}</div>
+                                </div>
+
+                                <div class="employee-stats">
+                                    <div class="calls-badge">
+                                        <span class="calls-icon">📞</span>
+                                        <span class="calls-count">{{ emp.calls24|default:"0" }}</span>
+                                        <span class="calls-label">за 24ч</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-department">
+                        <div class="empty-icon">🚫</div>
+                        <div class="empty-message">В этом отделе пока нет сотрудников</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="no-departments">
+            <div class="no-departments-icon">🏢</div>
+            <h3>Отделы не найдены</h3>
+            <p>Пока не создано ни одного отдела</p>
+        </div>
+    {% endfor %}
+</div>
+
 <style>
-.staff-table {
-    border-collapse: collapse;
-    border: 1px solid black;
+/* Стили для таблицы сотрудников */
+.departments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-.staff-table td,
-.staff-table th {
-    padding: 5px;
-    border: 1px solid black;
+.department-card {
+    background: var(--background-color, #ffffff);
+    border-radius: var(--border-radius, 8px);
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+    overflow: hidden;
+    border: 1px solid var(--border-color, #dee2e6);
+}
+
+.department-header {
+    background: linear-gradient(135deg, var(--primary-color, #2c3e50), var(--secondary-color, #3498db));
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.department-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.department-icon {
+    font-size: 1.2rem;
+}
+
+.department-id {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+}
+
+.department-managers {
+    background: var(--background-light, #f8f9fa);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.managers-label {
+    font-weight: 600;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 0.5rem;
+}
+
+.managers-list {
+    color: var(--text-color, #2c3e50);
+    font-weight: 500;
+}
+
+.employees-section {
+    padding: 2rem;
+}
+
+.employees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.employee-card {
+    background: var(--background-light, #f8f9fa);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 8px);
+    padding: 1.5rem;
+    transition: var(--transition, all 0.3s ease);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    vertical-align: middle;
+}
+
+.employee-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: var(--background-color, #ffffff);
+}
+
+.employee-avatar {
+    margin-bottom: 1rem;
+}
+
+.avatar-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary-color, #3498db);
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--border-color, #dee2e6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--text-light, #7f8c8d);
+}
+
+.avatar-icon {
+    font-size: 2rem;
+    color: var(--text-light, #7f8c8d);
+}
+
+.employee-info {
+    margin-bottom: 1rem;
+}
+
+.employee-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 0.3rem;
+}
+
+.employee-id {
+    font-size: 0.8rem;
+    color: var(--text-light, #7f8c8d);
+    margin-bottom: 0.5rem;
+}
+
+.employee-position {
+    font-size: 1rem;
+    color: var(--text-color, #2c3e50);
+    font-weight: 500;
+}
+
+.employee-stats {
+    width: 100%;
+}
+
+.calls-badge {
+    background: linear-gradient(135deg, var(--success-color, #27ae60), #2ecc71);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius, 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.calls-icon {
+    font-size: 1rem;
+}
+
+.calls-count {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.calls-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.empty-department {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-light, #7f8c8d);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-message {
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.no-departments {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-light, #7f8c8d);
+}
+
+.no-departments-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.no-departments h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color, #2c3e50);
+}
+
+.no-departments p {
+    font-size: 1.1rem;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .employees-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .department-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .department-managers {
+        padding: 1rem 1.5rem;
+    }
+
+    .employees-section {
+        padding: 1.5rem;
+    }
+
+    .employees-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .employee-card {
+        padding: 1rem;
+    }
+
+    .avatar-image,
+    .avatar-placeholder {
+        width: 60px;
+        height: 60px;
+    }
+
+    .avatar-icon {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .departments-container {
+        gap: 1.5rem;
+    }
+
+    .department-header {
+        padding: 1rem;
+    }
+
+    .department-title {
+        font-size: 1.1rem;
+    }
+
+    .department-managers {
+        padding: 0.75rem 1rem;
+    }
+
+    .employees-section {
+        padding: 1rem;
+    }
+
+    .employees-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .employee-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .empty-department {
+        padding: 2rem 1rem;
+    }
+
+    .empty-icon {
+        font-size: 2.5rem;
+    }
+
+    .no-departments {
+        padding: 3rem 1rem;
+    }
+
+    .no-departments-icon {
+        font-size: 3rem;
+    }
+}
+
+/* Дополнительные анимации */
+.employee-card .calls-badge {
+    transition: var(--transition, all 0.3s ease);
+}
+
+.employee-card:hover .calls-badge {
+    transform: scale(1.05);
+}
+
+.department-card {
+    transition: var(--transition, all 0.3s ease);
+}
+
+.department-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 </style>
-<h1>Список сотрудников по отделам</h1>
-
-<table class="staff-table">
-    <thead>
-        <tr>
-            <th>Отдел</th>
-            <th>Фото</th>
-            <th>Имя</th>
-            <th>Должность</th>
-            <th>Руководители</th>
-            <th>Звонков за 24ч</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for dep in context %}
-            {% for emp in dep.employees_list %}
-            <tr>
-                {% if forloop.first %}
-                <td rowspan="{{ dep.employees_list|length }}">
-                    <h3>{{ dep.departament_NAME  }}</h3>
-                    ID: {{ dep.departament_ID }}
-
-                </td>
-                {% endif %}
-                <td>
-                    {% if emp.avatar %}
-                    <img src="{{ emp.avatar }}" alt="avatar" width="50" height="50">
-                    {% else %}
-                    Нет фото
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="#" class="users" data-user-id="{{ emp.id }}">
-                        {{ emp.name }}
-                    </a>
-                    <br><small>ID: {{ emp.id }}</small>
-                </td>
-                <td>
-                  {{ emp.work_position|default:"-" }}
-                </td>
-                <td>
-                  {{ dep.managers_list|join:", " }}
-                </td>
-                <td>
-                    {{ emp.calls24|default:"0" }}
-                </td>
-            </tr>
-            {% endfor %}
-        {% endfor %}
-    </tbody>
-</table>
-
-<script src="https://api.bitrix24.com/api/v1/"></script>
-<script>
-    BX24.init(function () {
-        const links = document.querySelectorAll(".users");
-        links.forEach(function (link) {
-            link.onclick = function () {
-                const userId = this.dataset.userId;
-                BX24.openPath("/company/personal/user/" + userId + "/");
-            };
-        });
-    });
-</script>
 
 {% endblock %}

@@ -2,15 +2,116 @@
 <html lang="ru">
 <head>
   <script src="https://api-maps.yandex.ru/2.1/?apikey=59fdd512-90eb-464b-9605-bc86a1bc89a7&lang=ru_RU&load=package.full&debug=true" type="text/javascript"></script>
-
   <meta charset="UTF-8">
-  <title>Company</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компании</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --border: #dee2e6;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    header {
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .user-info {
+      color: var(--secondary);
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.2rem;
+      background-color: white;
+      color: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      color: white;
+    }
+  </style>
 </head>
 
-<body style="min-height: 100vh;">
-  <h1>Компании (user: {{request.bitrix_user.first_name}} {{request.bitrix_user.last_name}})</h1>
-  <button onclick="document.location='{% url 'start'%}'">⤾ Обратно в меню</button>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Управление компаниями</h1>
+      <div class="user-info">
+        Пользователь: {{request.bitrix_user.first_name}} {{request.bitrix_user.last_name}}
+      </div>
+    </div>
+  </header>
 
-  {% block content %}{% endblock %}
+  <div class="container">
+    <a href="{% url 'start'%}" class="btn">⤾ Назад в меню</a>
+
+    {% block content %}{% endblock %}
+  </div>
 </body>
 </html>

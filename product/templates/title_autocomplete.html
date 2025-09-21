@@ -1,5 +1,191 @@
 {% block input_title %}
-  <label for="product-title">Название товара:</label>
-  <input type="text" id="product-title" autocomplete="off">
-  <ul id="suggestions" style="border:1px solid #ccc; display:none; list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto;"></ul>
+<div class="autocomplete-container">
+    <label for="product-title" class="autocomplete-label">
+        📦 Название товара:
+    </label>
+    <div class="input-wrapper">
+        <input type="text"
+               id="product-title"
+               class="autocomplete-input"
+               placeholder="Начните вводить название товара..."
+               autocomplete="off">
+        <ul id="suggestions" class="suggestions-list" style="display:none;"></ul>
+    </div>
+</div>
+
+<style>
+/* Стили для автодополнения заголовков */
+.autocomplete-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.autocomplete-label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-color, #2c3e50);
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+}
+
+.input-wrapper {
+    position: relative;
+    max-width: 500px;
+}
+
+.autocomplete-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border: 2px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 8px);
+    background: var(--background-color, #ffffff);
+    transition: var(--transition, all 0.3s ease);
+    font-family: var(--font-family, inherit);
+}
+
+.autocomplete-input:focus {
+    outline: none;
+    border-color: var(--secondary-color, #3498db);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--background-color, #ffffff);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-top: none;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.1));
+    border-radius: 0 0 var(--border-radius, 8px) var(--border-radius, 8px);
+}
+
+.suggestions-list li {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    transition: var(--transition, all 0.3s ease);
+    color: var(--text-color, #2c3e50);
+}
+
+.suggestions-list li:hover {
+    background: var(--background-light, #f8f9fa);
+    color: var(--primary-color, #2c3e50);
+}
+
+.suggestions-list li:last-child {
+    border-bottom: none;
+}
+
+.suggestions-list li.no-results {
+    color: var(--text-light, #7f8c8d);
+    font-style: italic;
+    cursor: default;
+}
+
+.suggestions-list li.no-results:hover {
+    background: transparent;
+    color: var(--text-light, #7f8c8d);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .input-wrapper {
+        max-width: 100%;
+    }
+
+    .autocomplete-input {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .suggestions-list li {
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .autocomplete-input {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .suggestions-list li {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .autocomplete-label {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+// Скрипт для автодополнения
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('product-title');
+    const suggestions = document.getElementById('suggestions');
+    let timeout;
+
+    if (!input || !suggestions) return;
+
+    input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            suggestions.style.display = 'none';
+            return;
+        }
+
+        timeout = setTimeout(() => {
+            // Здесь должен быть запрос к серверу для получения предложений
+            // fetch(`/api/autocomplete/?q=${encodeURIComponent(query)}`)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         // Обработка результатов
+            //     });
+
+            // Временная заглушка
+            suggestions.innerHTML = `
+                <li>Пример товара 1</li>
+                <li>Пример товара 2</li>
+                <li>Пример товара 3</li>
+            `;
+            suggestions.style.display = 'block';
+        }, 300);
+    });
+
+    // Скрытие списка при клике вне
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+            suggestions.style.display = 'none';
+        }
+    });
+
+    // Обработка клика по предложению
+    suggestions.addEventListener('click', function(e) {
+        if (e.target.tagName === 'LI' && !e.target.classList.contains('no-results')) {
+            input.value = e.target.textContent;
+            suggestions.style.display = 'none';
+        }
+    });
+
+    // Скрытие при нажатии Escape
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            suggestions.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock %}
