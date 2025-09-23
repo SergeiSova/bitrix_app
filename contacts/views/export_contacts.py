@@ -16,10 +16,10 @@ def export_contacts(request):
 
         filter = {}
 
-        if request.POST.get('export_type') == 'on':
-            is_excel = True
-        else:
-            is_excel = False
+
+
+
+
 
         if request.POST.get('created_from'):
             filter['>DATE_CREATE'] = request.POST.get('created_from')
@@ -51,7 +51,12 @@ def export_contacts(request):
         data = client_parser(batch)
         exporter = ExportData(data)
 
-        if is_excel:
+        export_format = request.POST.get('export_type', 'csv')
+
+        if export_format not in ['csv', 'xlsx']:
+            export_format = 'csv'
+
+        if export_format == 'xlsx':
             return exporter.export_xlsx()
         else:
             return exporter.export_csv()

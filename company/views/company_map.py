@@ -62,6 +62,8 @@ def company_map(request):
 
     points = []
     for company_id, address in addresses.items():
+        if company_id not in companies:
+            continue
         point = {
             'TITLE': companies[company_id]['TITLE'],
             'GEOCODE': get_geocode(addresses[company_id]),
@@ -70,3 +72,14 @@ def company_map(request):
 
         points.append(point)
     return render(request, 'company_map.html', {'points': points})
+
+
+
+
+
+
+
+
+
+
+

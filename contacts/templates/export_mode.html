@@ -1,4 +1,3 @@
-
 {% extends 'contacts_page.html' %}
 
 {% block content %}
@@ -9,13 +8,13 @@
     <form method="post">
       {% csrf_token %}
       
-      <div class="toggle-container">
-        <span>CSV</span>
-        <label class='toggle-switch'>
-          <input type='checkbox' name='export_type'/>
-          <span class='slider'></span>
-        </label>
-        <span>XLSX</span>
+      <!-- Заменяем радио-кнопки на раскрывающийся список -->
+      <div class="form-group">
+        <label for="export_type_select">Формат экспорта:</label>
+        <select id="export_type_select" name="export_type" class="form-input">
+          <option value="csv">CSV</option>
+          <option value="xlsx">XLSX</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -93,6 +92,16 @@
     .subtitle {
       color: var(--secondary);
       margin-bottom: 1.5rem;
+    }
+
+    /* Стили для выпадающего списка */
+    .form-group select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      min-width: 120px;
+      background-color: white;
     }
   </style>
 {% endblock %}

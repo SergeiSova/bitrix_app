@@ -1,4 +1,5 @@
 import pandas as pd
+import chardet
 
 
 class ImportData:
@@ -15,17 +16,47 @@ class ImportData:
             'Компания': 'company_TITLE'
         }
 
+    def detect_encoding(self, file_path):
+        """Определяет кодировку файла"""
+        with open(file_path, 'rb') as f:
+            raw_data = f.read(10000)  # Читаем первые 10KB для определения кодировки
+            result = chardet.detect(raw_data)
+            return result.get('encoding', 'utf-8')
+
     def parse(self):
-        if self.extension == '.csv':
-            df = pd.read_csv(self.file_path, encoding='utf-8-sig')
+        try:
+            if self.extension == '.csv':
+                # Определяем кодировку автоматически
+                encoding = self.detect_encoding(self.file_path)
+                print(f"Определена кодировка CSV: {encoding}")
 
-        else:
-            df = pd.read_excel(self.file_path, engine='openpyxl')
+                df = pd.read_csv(self.file_path, encoding=encoding)
+            else:
+                df = pd.read_excel(self.file_path, engine='openpyxl')
 
-        df.fillna('', inplace=True)
+            # Проверяем, что файл не пустой
+            if df.empty:
+                print("Файл пуст")
+                return []
 
-        df.rename(columns=self.columns_map, inplace=True)
+            df.fillna('', inplace=True)
 
-        df = df[[v for v in self.columns_map.values()]]
+            # Переименовываем колонки (только существующие)
+            existing_columns = [col for col in self.columns_map.keys() if col in df.columns]
+            df.rename(columns={col: self.columns_map[col] for col in existing_columns}, inplace=True)
 
-        return df.to_dict(orient='records')
+            # Выбираем только существующие колонки после переименования
+            available_columns = [v for v in self.columns_map.values() if v in df.columns]
+            df = df[available_columns]
+
+            # Преобразуем все строковые значения в правильную кодировку
+            for col in df.columns:
+                if df[col].dtype == 'object':
+                    df[col] = df[col].apply(lambda x: x.encode('utf-8').decode('utf-8') if isinstance(x, str) else x)
+
+            print(f"Успешно распаршено {len(df)} записей")
+            return df.to_dict(orient='records')
+
+        except Exception as e:
+            print(f"Ошибка при парсинге файла: {str(e)}")
+            return []

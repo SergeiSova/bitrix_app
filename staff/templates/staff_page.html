@@ -188,10 +188,10 @@
 
         <div class="header-controls">
             <a href="{% url 'start' %}" class="btn btn-back">← Обратно в меню</a>
-            <form method="post" action="">
+            <form method="post" action="{% url 'call_generator' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">📞 Сгенерировать 10 звонков</button>
-            </form>
+            <button type="submit" class="btn btn-primary">📞 Сгенерировать звонки</button>
+                </form>
         </div>
 
         <div class="content-area">

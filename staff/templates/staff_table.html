@@ -33,7 +33,9 @@
                                 </div>
 
                                 <div class="employee-info">
-                                    <div class="employee-name">{{ emp.name }}</div>
+                                    <a href="javascript:void(0);" class="employee-name-link" data-user-id="{{ emp.id }}">
+                                        <div class="employee-name">{{ emp.name }}</div>
+                                    </a>
                                     <div class="employee-id">ID: {{ emp.id }}</div>
                                     <div class="employee-position">{{ emp.work_position|default:"—" }}</div>
                                 </div>
@@ -65,8 +67,64 @@
     {% endfor %}
 </div>
 
+<!-- Подключаем Bitrix24 API -->
+<script src="https://api.bitrix24.com/api/v1/"></script>
+
+<script>
+// Инициализируем Bitrix24 API
+BX24.init(function() {
+    // Добавляем обработчики клика на имена сотрудников
+    const employeeLinks = document.querySelectorAll('.employee-name-link');
+
+    employeeLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const userId = this.getAttribute('data-user-id');
+
+            // Открываем профиль пользователя через Bitrix24 API
+            BX24.openPath("/company/personal/user/" + userId + "/");
+        });
+    });
+
+    console.log('Bitrix24 API инициализирован, обработчики добавлены');
+});
+
+// Фолбэк на случай, если BX24 API недоступен
+setTimeout(function() {
+    if (typeof BX24 === 'undefined' || !BX24.init) {
+        console.warn('Bitrix24 API недоступен, используем альтернативный метод');
+
+        const employeeLinks = document.querySelectorAll('.employee-name-link');
+        employeeLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const userId = this.getAttribute('data-user-id');
+                alert('Профиль пользователя ID: ' + userId + '\nBitrix24 API недоступен');
+            });
+        });
+    }
+}, 2000);
+</script>
+
 <style>
-/* Стили для таблицы сотрудников */
+/* Стили для ссылки имени сотрудника */
+.employee-name-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+}
+
+.employee-name-link:hover .employee-name {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.employee-name {
+    transition: var(--transition, all 0.3s ease);
+}
+
+/* Остальные стили остаются без изменений */
 .departments-container {
     display: flex;
     flex-direction: column;
