@@ -1,0 +1,36 @@
+# Requirements file for Bitrix App
+# Django Integration with Bitrix24 CRM
+
+# Core Framework
+Django>=4.2.0,<5.0.0
+
+# HTTP requests library for API calls
+requests>=2.31.0
+
+# Environment variables management  
+python-dotenv>=1.0.0
+
+# Data processing and Excel/CSV handling
+pandas>=2.0.0
+openpyxl>=3.1.0
+chardet>=5.2.0
+
+# QR code generation
+qrcode>=7.4.0
+Pillow>=10.0.0
+
+# Time zone handling
+zoneinfo>=0.1.0;python_version<"3.9"
+
+# Logging
+logging>=0.4.9.6
+
+# Additional utilities that may be needed
+six>=1.16.0
+
+# Development dependencies (optional)
+# Uncomment if needed for development
+# black>=23.0.0
+# flake8>=6.0.0
+# pytest>=7.4.0
+# pytest-django>=4.8.0
