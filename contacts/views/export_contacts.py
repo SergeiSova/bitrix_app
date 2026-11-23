@@ -2,8 +2,8 @@ from django.shortcuts import render
 from integration_utils.bitrix24.functions.batch_api_call import _batch_api_call
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth
 
-from utils.export_data import ExportData
-from utils.data_parsers import client_parser
+from contacts.utils.export_data import ExportData
+from contacts.utils.data_parsers import client_parser
 
 
 @main_auth(on_cookies=True)
@@ -27,14 +27,17 @@ def export_contacts(request):
         if request.POST.get('last_active'):
             filter['>LAST_ACTIVITY_TIME'] = request.POST.get('last_active')
 
-        if request.POST.get('company_name'):
-            try:
-                for company in companies.values():
-                    if company.get('TITLE') == request.POST.get('company_name'):
-                        company_id = company.get('ID')
-                        filter['COMPANY_ID'] = company_id
-            except:
-                pass
+        company_name = request.POST.get('company_name', '').strip()
+        if company_name:
+            company_ids = [
+                company.get('ID') for company in companies.values()
+                if company.get('TITLE') == company_name
+            ]
+            if not company_ids:
+                return render(request, 'export_mode.html', {
+                    'error_message': f'Компания «{company_name}» не найдена. Экспорт не выполнен.',
+                }, status=400)
+            filter['COMPANY_ID'] = company_ids[-1]
 
         contacts = but.call_list_method('crm.contact.list', {'filter': filter,
                                                              'select':['ID']})

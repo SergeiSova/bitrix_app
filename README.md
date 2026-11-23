@@ -111,7 +111,8 @@ bitrix_app/
 ```env
 BITRIX_DOMAIN=your-domain.bitrix24.ru
 ROOT_URL=https://your-app-domain.com
-YANDEX_API_KEY=your-yandex-api-key
+YANDEX_API_KEY=your-yandex-geocoder-key
+YANDEX_MAPS_JS_KEY=your-yandex-maps-js-key
 ```
 
 ## 🚀 Установка и запуск
