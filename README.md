@@ -108,18 +108,17 @@ bitrix_app/
 
 Проект использует переменные окружения через `.env` файл:
 
+Все переменные с примерами перечислены в `.env.example`. Обязательные для портала:
+
 ```env
+DJANGO_SECRET_KEY=change-this-secret
 BITRIX_DOMAIN=your-domain.bitrix24.ru
+BITRIX_CLIENT_ID=your-local-app-client-id
+BITRIX_CLIENT_SECRET=your-local-app-client-secret
 ROOT_URL=https://your-app-domain.com
-YANDEX_API_KEY=your-yandex-geocoder-key
-YANDEX_MAPS_JS_KEY=your-yandex-maps-js-key
-BITRIX_WEBHOOK_AUTH=your-webhook-auth
-ENABLE_TEST_CALL_GENERATOR=0
 ```
 
 ## 🚀 Установка и запуск
-
-> В репозитории пока нет `manage.py`, `settings.py` и корневого `urls.py`. Перед запуском их нужно добавить в проект.
 
 1. **Клонирование репозитория:**
 ```bash
@@ -153,6 +152,8 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+6. **Подключение к Bitrix24:** создайте локальное приложение на портале и укажите `ROOT_URL/` как путь обработчика и путь первоначальной установки. Портал открывает приложение по HTTPS, поэтому для локальной проверки нужен HTTPS-туннель.
+
 ## 📝 API Endpoints
 
 ### Сделки:
@@ -162,10 +163,10 @@ python manage.py runserver
 - `/add/` - создание новой сделки
 
 ### Другие модули:
-- `/contacts/` - управление контактами
-- `/product/` - работа с товарами
-- `/company/` - карта компаний
-- `/staff/` - список сотрудников
+- `/contacts/import/`, `/contacts/export/` - импорт и экспорт контактов
+- `/product/generator/`, `/product/catalog/` - QR-коды и каталог товаров
+- `/company_map/` - карта компаний
+- `/telephony/` - список сотрудников и звонки
 
 ## 🔐 Авторизация
 

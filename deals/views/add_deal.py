@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
+from django.views.decorators.csrf import csrf_protect
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth
 import logging
 @main_auth(on_cookies=True)
+@csrf_protect
 def add_deal(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         stage_id = request.POST.get("stage_id", "").strip()

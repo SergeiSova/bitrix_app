@@ -2,7 +2,7 @@
 # Django Integration with Bitrix24 CRM
 
 # Core Framework
-Django>=4.2.0,<5.0.0
+Django>=5.2,<5.3
 
 # HTTP requests library for API calls
 requests>=2.31.0
@@ -23,6 +23,8 @@ Pillow>=10.0.0
 
 # Additional utilities that may be needed
 six>=1.16.0
+pytz>=2024.1
+django-prettyjson>=0.4.1
 
 # Development dependencies (optional)
 # Uncomment if needed for development
