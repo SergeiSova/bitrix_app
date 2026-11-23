@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from integration_utils.bitrix24.functions.batch_api_call import _batch_api_call
+from django.views.decorators.csrf import csrf_protect
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth
 
 from contacts.utils.export_data import ExportData
@@ -7,6 +8,7 @@ from contacts.utils.data_parsers import client_parser
 
 
 @main_auth(on_cookies=True)
+@csrf_protect
 def export_contacts(request):
     but = request.bitrix_user_token
 

@@ -4,6 +4,7 @@ import tempfile
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_protect
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth
 from integration_utils.bitrix24.functions.batch_api_call import _batch_api_call
 
@@ -13,6 +14,7 @@ from contacts.utils.import_data import ImportData
 ALLOWED_EXTENSIONS = ['.csv', '.xlsx']
 
 @main_auth(on_cookies=True)
+@csrf_protect
 def import_contacts(request):
     but = request.bitrix_user_token
 

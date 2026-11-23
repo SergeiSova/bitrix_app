@@ -6,6 +6,7 @@ import time
 from django.shortcuts import redirect
 from django.utils import timezone
 
+from django.views.decorators.csrf import csrf_protect
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ def generate_phone_number():
 
 
 @main_auth(on_cookies=True)
+@csrf_protect
 def call_generator(request):
     """Создать тестовые звонки. Работает только при ENABLE_TEST_CALL_GENERATOR=1."""
     if request.method == 'POST' and os.getenv('ENABLE_TEST_CALL_GENERATOR') == '1':

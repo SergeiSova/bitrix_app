@@ -7,6 +7,7 @@ from django.shortcuts import render  # Функция render для рендер
 
 from dotenv import load_dotenv  # Загрузка переменных окружения из .env-файла
 
+from django.views.decorators.csrf import csrf_protect
 from integration_utils.bitrix24.bitrix_user_auth.main_auth import main_auth  # Декоратор для аутентификации пользователя в Bitrix24
 from integration_utils.bitrix24.exceptions import BitrixApiError  # Исключение при ошибках API Bitrix24
 
@@ -18,6 +19,7 @@ load_dotenv()
 
 # Декоратор для аутентификации на основе cookies
 @main_auth(on_cookies=True)
+@csrf_protect
 def qr_generator(request):
 
     # Получаем токен пользователя Bitrix24 из запроса

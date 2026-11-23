@@ -1,6 +1,6 @@
 from django.urls import path
 
-from start.views.start import start
+from django.views.generic import RedirectView
 from product.api.autocomplete_products import autocomplete_products
 from product.views.qr_generator import qr_generator
 from product.views.cards import product_card
@@ -11,5 +11,5 @@ urlpatterns = [
     path('catalog/', product_catalog, name='catalog'),
     path('card/<slug:uuid>/', product_card, name='product_card'),
     path('autocomplete/', autocomplete_products, name='autocomplete'),
-    path('',start, name='start')
+    path('', RedirectView.as_view(pattern_name='qr_generator'), name='product_home')
 ]
