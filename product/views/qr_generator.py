@@ -85,7 +85,7 @@ def qr_generator(request):
                         uuid = str(qr_link.unique_id)
 
                         # Формируем URL для карточки товара
-                        gen_url = root_url + "/product/card/" + uuid
+                        gen_url = f"{root_url.rstrip('/')}/product/card/{uuid}/"
 
                         # Отладочный вывод: сгенерированный URL
                         print(f"DEBUG: Generated URL: {gen_url}")

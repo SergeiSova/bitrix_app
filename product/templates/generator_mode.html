@@ -131,7 +131,12 @@
 
                     data.results.forEach(item => {
                         const li = document.createElement("li");
-                        li.innerHTML = `<strong>${item.name}</strong> <span class="item-id">(ID: ${item.id})</span>`;
+                        const itemName = document.createElement("strong");
+                        itemName.textContent = item.name;
+                        const itemId = document.createElement("span");
+                        itemId.className = "item-id";
+                        itemId.textContent = `(ID: ${item.id})`;
+                        li.append(itemName, " ", itemId);
                         li.dataset.id = item.id;
                         li.dataset.name = item.name;
                         li.className = "autocomplete-item";

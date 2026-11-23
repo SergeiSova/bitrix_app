@@ -113,9 +113,13 @@ BITRIX_DOMAIN=your-domain.bitrix24.ru
 ROOT_URL=https://your-app-domain.com
 YANDEX_API_KEY=your-yandex-geocoder-key
 YANDEX_MAPS_JS_KEY=your-yandex-maps-js-key
+BITRIX_WEBHOOK_AUTH=your-webhook-auth
+ENABLE_TEST_CALL_GENERATOR=0
 ```
 
 ## 🚀 Установка и запуск
+
+> В репозитории пока нет `manage.py`, `settings.py` и корневого `urls.py`. Перед запуском их нужно добавить в проект.
 
 1. **Клонирование репозитория:**
 ```bash

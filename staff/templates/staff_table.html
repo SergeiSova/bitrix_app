@@ -43,7 +43,7 @@
                                 <div class="employee-stats">
                                     <div class="calls-badge">
                                         <span class="calls-icon">📞</span>
-                                        <span class="calls-count">{{ emp.calls24|default:"0" }}</span>
+                                        <span class="calls-count">{{ emp.calls24|default_if_none:"—" }}</span>
                                         <span class="calls-label">за 24ч</span>
                                     </div>
                                 </div>
