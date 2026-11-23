@@ -71,7 +71,10 @@ def company_map(request):
         }
 
         points.append(point)
-    return render(request, 'company_map.html', {'points': points})
+    return render(request, 'company_map.html', {
+        'points': points,
+        'yandex_maps_js_key': os.environ['YANDEX_MAPS_JS_KEY'],
+    })
 
 
 

@@ -5,6 +5,10 @@
     <h2>Экспорт контактов</h2>
     <p class="subtitle">Выберите параметры для экспорта данных</p>
 
+    {% if error_message %}
+      <p role="alert" style="color: #721c24; background-color: #f8d7da; padding: 0.75rem 1rem; border-radius: 4px;">{{ error_message }}</p>
+    {% endif %}
+
     <form method="post">
       {% csrf_token %}
       
