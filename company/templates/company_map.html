@@ -34,20 +34,31 @@
       });
 
       companyData.forEach(function (company) {
-        const placemark = new ymaps.Placemark(company.GEOCODE, {
-          hintContent: company.TITLE,
-          balloonContent: `
-            <div style="padding: 10px;">
-              <h3 style="margin: 0 0 10px 0;">${company.TITLE}</h3>
-              ${company.logoURL ? `<img src="${company.logoURL}" style="max-width: 100px; max-height: 60px; margin-bottom: 10px;">` : ''}
-            </div>
-          `
-        }, {
+        const balloon = document.createElement('div');
+        balloon.style.padding = '10px';
+        const title = document.createElement('h3');
+        title.style.margin = '0 0 10px 0';
+        title.textContent = company.TITLE;
+        balloon.appendChild(title);
+        if (company.logoURL) {
+          const logo = document.createElement('img');
+          logo.src = company.logoURL;
+          logo.style.maxWidth = '100px';
+          logo.style.maxHeight = '60px';
+          balloon.appendChild(logo);
+        }
+
+        const iconOptions = company.logoURL ? {
           iconLayout: 'default#image',
-          iconImageHref: company.logoURL || 'https://via.placeholder.com/40',
+          iconImageHref: company.logoURL,
           iconImageSize: [40, 40],
           iconImageOffset: [-20, -20]
-        });
+        } : {preset: 'islands#blueDotIcon'};
+
+        const placemark = new ymaps.Placemark(company.GEOCODE, {
+          hintContent: company.TITLE,
+          balloonContent: balloon.outerHTML
+        }, iconOptions);
 
         map.geoObjects.add(placemark);
       });

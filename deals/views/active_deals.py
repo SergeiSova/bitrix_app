@@ -13,7 +13,7 @@ def iso_transform(date_str: str) -> str:
         dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
         dt_moscow = dt.astimezone(ZoneInfo('Europe/Moscow'))
         return dt_moscow.strftime('%d-%m-%Y')
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, AttributeError):
         return date_str
 
 
@@ -42,7 +42,7 @@ def active_deals(request: HttpRequest) -> HttpResponse:
                     'ASSIGNED_BY_ID': user_id,
                     "!@STAGE_ID": ["WON", "LOSE", "APPLOGY"],
                 },
-                'order': {'BEGINDATE': 'ASC'},
+                'order': {'BEGINDATE': 'DESC'},
                 'select': [
                     'ID', 'STAGE_ID', 'TITLE', 'OPPORTUNITY',
                     'BEGINDATE', 'CLOSEDATE', 'UF_CRM_1757887195',

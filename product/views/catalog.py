@@ -13,10 +13,10 @@ def product_catalog(request):
     but = request.bitrix_user_token
 
     # Запрашиваем список товаров из CRM с сортировкой по ID и выборкой нужных полей
-    product_list = but.call_api_method("crm.product.list", {
-        'order': ['ID'],
+    product_list = but.call_list_method("crm.product.list", {
+        'order': {'ID': 'ASC'},
         'select': ['ID', 'NAME', 'ACTIVE', 'DATE_CREATE', 'PRICE'],
-    })['result']
+    })
 
     # Проходим по каждому товару и преобразуем дату создания
     for product in product_list:

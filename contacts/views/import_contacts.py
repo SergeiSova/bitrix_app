@@ -39,21 +39,23 @@ def import_contacts(request):
 
             temp_file_path = temp_file.name
             temp_file.close()
-            imported = ImportData(temp_file_path, ext)
-            data_list = imported.parse()
+            try:
+                data_list = ImportData(temp_file_path, ext).parse()
+            finally:
+                os.remove(temp_file_path)
 
             companies = but.call_list_method('crm.company.list', {'select':['ID','TITLE']})
-            companies = {company['TITLE']: company for company in companies}
+            company_ids = {company['TITLE']: company['ID'] for company in companies}
 
             contact_data_add = []
             for data in data_list:
-                if data['company_TITLE'] in list(companies.keys()):
-                    data['company_ID'] = companies[data['company_TITLE']]['ID']
-                else:
-                    company_id = but.call_list_method('crm.company.add', {'fields': {'TITLE': data['company_TITLE']}})
-                    data['company_ID'] = company_id
+                company_title = str(data.get('company_TITLE', '')).strip()
+                if company_title and company_title not in company_ids:
+                    response = but.call_api_method('crm.company.add', {'fields': {'TITLE': company_title}})
+                    company_ids[company_title] = response['result']
+                data['company_ID'] = company_ids.get(company_title, '')
 
-                if data['contact_ID'] == '':
+                if data.get('contact_ID', '') == '':
                     contact_data_add.append(data)
 
             batch = []
@@ -75,19 +77,11 @@ def import_contacts(request):
                     {"fields": fields}
                 ))
 
-            add_result = _batch_api_call(
-                methods=batch,
-                bitrix_user_token=but,
-                function_calling_from_bitrix_user_token_think_before_use=True)
-
-
-
-            try:
-                os.remove(temp_file_path)
-                print(f"[ExportFile] Файл удалён: {temp_file_path}")
-            except Exception as e:
-                print(f"[ExportFile] Ошибка при удалении: {e}")
-
+            if batch:
+                _batch_api_call(
+                    methods=batch,
+                    bitrix_user_token=but,
+                    function_calling_from_bitrix_user_token_think_before_use=True)
 
         else:
             return HttpResponse('Произошла ошибка при загрузке файла. Возможно вы не выбрали его.')

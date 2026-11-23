@@ -19,11 +19,7 @@ chardet>=5.2.0
 qrcode>=7.4.0
 Pillow>=10.0.0
 
-# Time zone handling
-zoneinfo>=0.1.0;python_version<"3.9"
 
-# Logging
-logging>=0.4.9.6
 
 # Additional utilities that may be needed
 six>=1.16.0

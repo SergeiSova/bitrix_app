@@ -188,10 +188,12 @@
 
         <div class="header-controls">
             <a href="{% url 'start' %}" class="btn btn-back">← Обратно в меню</a>
+            {% if can_generate_calls %}
             <form method="post" action="{% url 'call_generator' %}">
                 {% csrf_token %}
             <button type="submit" class="btn btn-primary">📞 Сгенерировать звонки</button>
                 </form>
+            {% endif %}
         </div>
 
         <div class="content-area">
